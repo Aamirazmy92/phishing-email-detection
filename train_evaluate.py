@@ -25,6 +25,11 @@ def _slug(name):
 
 def main():
     df = load_dataset()
+    # CEAS contains many emails that are identical after cleaning; if they land
+    # on both sides of the split the test score is inflated.
+    before = len(df)
+    df = df[df["clean_text"].str.len() > 0].drop_duplicates("clean_text")
+    print(f"Dropped {before - len(df)} duplicate/empty emails ({len(df)} remain)")
     X, y = df["clean_text"], df["label"]
 
     X_train, X_test, y_train, y_test = train_test_split(
